@@ -1,0 +1,94 @@
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Doc Verification Animations</title>
+        <!--meta name='viewport' content='initial-scale=1, viewport-fit=cover'-->
+        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <script src="https://www.w3schools.com/lib/w3.js"></script>
+        <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h6>Lorem ipsum</h6>
+            <div class="top-animation">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+            <div class="interface-wrapper">
+                <div class="doc-selector-grid">
+                    <input type="radio" id="doc-verification" name="doc-group" value="verification" checked>
+                    <label for="doc-verification">Verification</label>
+                    
+                    <input type="radio" id="doc-id" name="doc-group" value="ID">
+                    <label for="doc-id">ID</label>
+                
+                    <input type="radio" id="doc-card" name="doc-group" value="card">
+                    <label for="doc-card">Card</label>
+
+                    <input type="radio" id="doc-document" name="doc-group" value="document">
+                    <label for="doc-document">Document</label>
+
+                    <input type="radio" id="doc-selfie" name="doc-group" value="selfie">
+                    <label for="doc-selfie">Selfie</label>
+
+                    <input type="radio" id="doc-selfie+id" name="doc-group" value="selfie+ID">
+                    <label for="doc-selfie+id">Selfie + ID</label>
+
+                    <input type="radio" id="doc-selfie+document" name="doc-group" value="selfie+document">
+                    <label for="doc-selfie+document">Selfie+Document</label>
+
+                    <input type="radio" id="doc-selfie+card" name="doc-group" value="selfie+card">
+                    <label for="doc-selfie+card">Selfie+Card</label>
+
+                    <input type="radio" id="doc-success" name="doc-group" value="success">
+                    <label for="doc-success">Success</label>
+                    
+                    <input type="radio" id="doc-pending" name="doc-group" value="pending">
+                    <label for="doc-pending">Pending</label>
+                
+                    <input type="radio" id="doc-CS" name="doc-group" value="CS">
+                    <label for="doc-CS">CS</label>
+
+                    <input type="radio" id="doc-error" name="doc-group" value="error">
+                    <label for="doc-error">Error</label>
+                </div>                
+            
+ 
+                <div class="theme-grid">
+                    <input type="radio" id="option-a" name="theme-group" checked>
+                    <label for="option-a">Chieftain</label>
+                    
+                    <input type="radio" id="option-b" name="theme-group">
+                    <label for="option-b">LeoVegas</label>
+                
+                    <input type="radio" id="option-c" name="theme-group">
+                    <label for="option-c">BetMGM</label>
+                
+                    <input type="radio" id="option-d" name="theme-group">
+                    <label for="option-d">Expekt</label>
+
+                    <input type="radio" id="option-e" name="theme-group">
+                    <label for="option-e">GoGo</label>
+                    
+                    <input type="radio" id="option-f" name="theme-group">
+                    <label for="option-f">Royal Panda</label>
+
+                    <input type="radio" id="option-g" name="theme-group">
+                    <label for="option-g">Pink Casino</label>
+
+                    <input type="radio" id="option-h" name="theme-group">
+                    <label for="option-h">BetUK</label>
+
+                    <input type="radio" id="option-i" name="theme-group">
+                    <label for="option-i">21.UK</label>
+
+                    <input type="radio" id="option-j" name="theme-group">
+                    <label for="option-j">Slot Boss</label>
+
+                </div>
+            </div>
+  
+        </div>
+        <script src="js/init.js"></script>  
+    </body>
+</html>
