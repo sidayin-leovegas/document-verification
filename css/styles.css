@@ -19,6 +19,10 @@
     --success-mid:#019592;
     --success-light:#E5F4F3;
 
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E7E7FC;
+
     --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
@@ -150,6 +154,7 @@ input[type="radio"] {
 }
 
 /* --- Theme Overrides --- */
+/*Chieftain*/
 body:has(#option-a:checked) { --primary-500: #6200ee; --primary-400: #7f39fb; --primary-300: #985eff; --font: "Roboto"; --default-bg: #f1f1f8; 
 --error-dark:#B62D20;
     --error-mid:#EF4C3C;
@@ -165,7 +170,12 @@ body:has(#option-a:checked) { --primary-500: #6200ee; --primary-400: #7f39fb; --
 
     --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
+    
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E7E7FC;
 }
+/*LeoVegas*/
 body:has(#option-b:checked) { --primary-500: #ee4400; --primary-400: #ff6600; --primary-300: #f18825; --font: "Roboto"; --default-bg: #f2f2f2; 
 --error-dark:#CE0000;
     --error-mid:#FF391C;
@@ -178,9 +188,15 @@ body:has(#option-b:checked) { --primary-500: #ee4400; --primary-400: #ff6600; --
     --success-dark:#00592E;
     --success-mid:#09894D;
     --success-light:#E5F4EB;
+    
+    --info-dark:#2481B3;
+    --info-mid:#32A1D4;
+    --info-light:#E1F4F9;
+
     --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 }
+/*BetMGM*/
 body:has(#option-c:checked) { --primary-500: #b19661; --primary-400: #bda679; --primary-300: #c8b690; --font: "Sofia Sans"; --default-bg: #f1f0ec; 
 --error-dark:#B62D20;
     --error-mid:#D33C2D;
@@ -193,11 +209,16 @@ body:has(#option-c:checked) { --primary-500: #b19661; --primary-400: #bda679; --
     --success-dark:#224543;
     --success-mid:#008C71;
     --success-light:#D6EAE6;
+    
+    --info-dark:#1618D3;
+    --info-mid:#373AE5;
+    --info-light:#E7E7FC;
+
     --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
-
+/*Expekt*/
 body:has(#option-d:checked) { --primary-500: #fe8000; --primary-400: #fe9326; --primary-300: #fea64d; --font: "Inter"; --default-bg: #f5f7fb; 
 --error-dark:#A90D13;
     --error-mid:#D8232A;
@@ -210,9 +231,17 @@ body:has(#option-d:checked) { --primary-500: #fe8000; --primary-400: #fe9326; --
     --success-dark:#076B40;
     --success-mid:#2DAC75;
     --success-light:#E5FFF4;
-        --bg-top: var(--primary-400);
+    
+    --info-dark:#0D457A;
+    --info-mid:#2969A5;
+    --info-light:#E9F4FF;
+        
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
+
+
 }
+/*GoGo*/
 body:has(#option-e:checked) { --primary-500: #f14aa7; --primary-400: #f365b4; --primary-300: #f580c1; --font: "Poppins"; --default-bg: #000000; --paper: #222; --body-text: #fff; 
 --error-dark:#681219;
     --error-mid:#FF3D4D;
@@ -225,10 +254,16 @@ body:has(#option-e:checked) { --primary-500: #f14aa7; --primary-400: #f365b4; --
     --success-dark:#093D28;
     --success-mid:#00C475;
     --success-light:#EDFFF2;
-        --bg-top: var(--primary-400);
+        
+    --info-dark:#004881;
+    --info-mid:#0394E2;
+    --info-light:#F3F2FF;
+        
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
+/*Royal Panda*/
 body:has(#option-f:checked) { --primary-500: #53a653; --primary-400: #72b672; --primary-300: #91c691; --font: "Kanit"; --default-bg: #f9f9f9; 
 --error-dark:#8B1915;
     --error-mid:#D9251F;
@@ -241,10 +276,16 @@ body:has(#option-f:checked) { --primary-500: #53a653; --primary-400: #72b672; --
     --success-dark:#366B40;
     --success-mid:#53A653;
     --success-light:#EEF6EE;
-        --bg-top: var(--primary-400);
+
+    --info-dark:#00498E;
+    --info-mid:#2969A5;
+    --info-light:#EDF6FF;
+        
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
+/*Pink*/
 body:has(#option-g:checked) { --primary-500: #ff1a7a; --primary-400: #ff3c8e; --primary-300: #ff5fa2; --font: "Dosis"; --default-bg: #2e1a37; --paper: #452b51; --body-text: #fff; 
 --error-dark:#AE000C;
     --error-mid:#E62C39;
@@ -257,10 +298,16 @@ body:has(#option-g:checked) { --primary-500: #ff1a7a; --primary-400: #ff3c8e; --
     --success-dark:#087E29;
     --success-mid:#42C867;
     --success-light:#E9FFEF;
-        --bg-top: var(--primary-400);
+    
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E9EEFF;
+        
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
+/*BetUK*/
 body:has(#option-h:checked) { --primary-500: #e61629; --primary-400: #ea3949; --primary-300: #ee5c69; --font: "Barlow Condensed"; --default-bg: #e8eef4; --body-text: #002e52; 
 --error-dark:#B2000C;
     --error-mid:#E62C39;
@@ -273,10 +320,16 @@ body:has(#option-h:checked) { --primary-500: #e61629; --primary-400: #ea3949; --
     --success-dark:#008123;
     --success-mid:#42C867;
     --success-light:#ECFFF1;
-        --bg-top: var(--primary-400);
+
+    --info-dark:#0058B9;
+    --info-mid:#3696FF;
+    --info-light:#ECF5FF;
+    
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
+/*21 UK*/
 body:has(#option-i:checked) { --primary-500: #00d0f4; --primary-400: #26d7f6; --primary-300: #4ddef7; --font: "Montserrat"; --default-bg: #1a222d; --paper: #000; --body-text: #fff; 
 --error-dark:#A3000F;
     --error-mid:#FF4A5B;
@@ -289,10 +342,16 @@ body:has(#option-i:checked) { --primary-500: #00d0f4; --primary-400: #26d7f6; --
     --success-dark:#037031;
     --success-mid:#38D47A;
     --success-light:#E9FFEF;
-        --bg-top: var(--primary-400);
+
+    --info-dark:#00629A;
+    --info-mid:#00D0F4;
+    --info-light:#E9EEFF;
+    
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
 }
+/*Slot Boss*/
 body:has(#option-j:checked) { --primary-500: #9bc449; --primary-400: #aacd64; --primary-300: #b9d680; --font: "Montserrat"; --default-bg: #eef3f3;
 --error-dark:#B60919;
     --error-mid:#FF4A5B;
@@ -305,10 +364,16 @@ body:has(#option-j:checked) { --primary-500: #9bc449; --primary-400: #aacd64; --
     --success-dark:#547B06;
     --success-mid:#90BC38;
     --success-light:#F5FDE6;
-        --bg-top: var(--primary-400);
+    
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E9EEFF;
+    
+    --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 
  }
+
 
  body:has(#doc-success:checked) {
      --bg-top: var(--success-dark);
@@ -325,4 +390,8 @@ body:has(#doc-pending:checked) {
  body:has(#doc-error:checked) {
      --bg-top: var(--error-dark);
      --bg-bottom: var(--error-mid);
+ }
+body:has(#doc-RG:checked) {
+     --bg-top: var(--info-dark);
+     --bg-bottom: var(--info-mid);
  }
