@@ -394,7 +394,7 @@ body:has(#doc-pending:checked) {
      --bg-top: var(--error-dark);
      --bg-bottom: var(--error-mid);
  }
-body:has(#doc-RG:checked) {
+body:has(#doc-RG:checked),body:has(#doc-processing:checked) {
      --bg-top: var(--info-dark);
      --bg-bottom: var(--info-mid);
  }
