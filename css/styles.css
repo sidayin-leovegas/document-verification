@@ -155,6 +155,11 @@ input[type="radio"] {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
 }
+@media (min-width: 632px){
+    .container{
+            padding: calc(var(--spaceunit) * 4) calc(var(--spaceunit) * 8);
+    }
+}
 
 /* --- Theme Overrides --- */
 /*Chieftain*/
