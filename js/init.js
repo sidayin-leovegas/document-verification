@@ -37,8 +37,6 @@ function initRive() {
     // Convert CSS strings to Rive-compatible numbers
     const topColor = cssToRiveColor(topColorCSS);
     const bottomColor = cssToRiveColor(bottomColorCSS);
-    console.log("getting colors: ", topColorCSS, bottomColorCSS);
-
     // Clean up existing instance if it exists
     if (r) {
         r.cleanup();
