@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "March 30, 2026 - 17:35"; 
+const JS_VERSION_TIME = "March 30, 2026 - 17:42"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -44,14 +44,12 @@ function displayVersion() {
     }
 }
 
-/**
- * Generates a QR code for the current page URL
- */
 function generateQR() {
     if (qrContainer && qrImage) {
         const currentUrl = window.location.href;
-        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentUrl)}`;
-        qrContainer.style.display = "block";
+        // Using a higher resolution for the QR to keep it crisp
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+        qrContainer.style.display = "inline-flex";
     }
 }
 
@@ -65,13 +63,13 @@ function updateUI(state) {
     loaderContainer.style.display = "none";
     uiTitle.style.display = "block";
     mainBtn.style.display = "none";
-    if (qrContainer) qrContainer.style.display = "none"; // Hide QR by default
+    if (qrContainer) qrContainer.style.display = "none";
 
     switch(state) {
         case "desktop":
             uiTitle.style.display = "none";
             uiBody.innerText = "Please open this page on a mobile device to test this feature.";
-            generateQR(); // Show QR Code for desktop users
+            generateQR();
             break;
 
         case "verification":

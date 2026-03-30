@@ -64,17 +64,39 @@ body { padding-top: calc(var(--spaceunit) * 2); }
 
 #version-tag { text-align: center; font-family: var(--font); font-size: 11px; color: #999; margin-top: 12px; opacity: 0.8; }
 
+/* Wrapper to handle horizontal centering */
+#qr-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+/* Square container that shrink-wraps the QR image */
 #qr-container {
-    margin: 20px auto;
-    padding: 15px;
-    background: #fff;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: #ffffff;
     border-radius: 12px;
-    display: inline-block;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 #qr-image {
-    width: 150px;
-    height: 150px;
+    width: 160px; /* Square dimensions */
+    height: 160px;
     display: block;
+    border-radius: 4px;
+}
+
+#qr-text {
+    font-family: var(--font);
+    font-size: 12px;
+    color: #999999;
+    margin-top: 12px;
+    margin-bottom: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
