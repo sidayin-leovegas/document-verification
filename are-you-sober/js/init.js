@@ -168,18 +168,23 @@ function pauseTimer() {
 }
 
 mainBtn.addEventListener('click', () => {
-    if (currentState === "verification") {
-        if (typeof DeviceMotionEvent.requestPermission === 'function') {
-            DeviceMotionEvent.requestPermission().then(permission => {
-                if (permission === 'granted') {
+    // 1. Check if the browser requires explicit permission (iOS 13+)
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    // 2. Permission granted! Start the sensors
                     window.addEventListener('devicemotion', handleSensors);
                     updateUI("balance");
+                } else {
+                    console.error("Sensor permission denied.");
                 }
-            });
-        } else {
-            window.addEventListener('devicemotion', handleSensors);
-            updateUI("balance");
-        }
+            })
+            .catch(console.error);
+    } else {
+        // 3. Browser doesn't use requestPermission (Android/Older iOS)
+        window.addEventListener('devicemotion', handleSensors);
+        updateUI("balance");
     }
 });
 
