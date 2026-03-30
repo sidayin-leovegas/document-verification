@@ -13,15 +13,19 @@ let timerInterval = null;
 let stillnessBuffer = 0;
 let successTriggered = false;
 
-const FLAT_LIMIT = 8;           
-const SMOOTHING_FACTOR = 0.15;   
+const FLAT_LIMIT = 10;           // Forgiving angle for "flat"
+const SMOOTHING_FACTOR = 0.15;   // Low-pass filter for success logic
 let smoothedMovement = 0;
 
-const TABLE_STILLNESS = 0.02;    
-const HAND_STILLNESS_MIN = 0.05;  
-const HAND_STILLNESS_MAX = 0.30;  
+// Movement Thresholds (Acceleration Magnitude)
+const TABLE_THRESHOLD = 0.07;    // Trigger Error if movement is below this
+const HAND_MOTION_MIN = 0.12;    // Floor for human hand tremors
+const HAND_STILLNESS_MAX = 0.30; // Max sway allowed for "Sober" check
+const STILLNESS_REQUIRED_FRAMES = 20; // ~400ms of sustained stillness for Error
 
-/** * Robust Mobile & Sensor Detection */
+/** * Mobile & Sensor Detection 
+ * Checks for hardware presence to separate desktop inspect mode
+ */
 const isTrueMobile = () => {
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const hasSensors = typeof DeviceOrientationEvent !== 'undefined';
@@ -32,6 +36,9 @@ const isTrueMobile = () => {
 const getHex = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const toRive = (v) => parseInt(`0xFF${getHex(v).replace('#', '')}`, 16);
 
+/**
+ * Updates UI content and visibility based on state
+ */
 function updateUI(state) {
     if (!isTrueMobile()) state = "desktop";
     if (currentState === state && state !== "balance") return;
@@ -73,12 +80,15 @@ function updateUI(state) {
             break;
     }
     
-    // Logic Change: Use "keep" animation during the keeping_still phase
+    // Map internal UI state to Rive animation names
     let rivType = state;
     if (state === "keeping_still") rivType = "keep";
     loadRive(rivType);
 }
 
+/**
+ * Loads Rive animation and sets dynamic ViewModel properties
+ */
 function loadRive(docType) {
     if (r) r.cleanup();
     let rivType = (docType === "initial") ? "verification" : docType;
@@ -98,12 +108,14 @@ function loadRive(docType) {
                 const cocktail = vmi.color("cocktail_color");
                 if (cocktail) cocktail.value = toRive('--primary-500');
 
+                // Dynamic Gradients
                 const tCol = (rivType === "error") ? toRive('--error-dark') : (rivType === "success") ? toRive('--success-dark') : toRive('--primary-400');
                 const bCol = (rivType === "error") ? toRive('--error-mid') : (rivType === "success") ? toRive('--success-mid') : toRive('--primary-300');
 
                 vmi.color("gradient_top").value = tCol;
                 vmi.color("gradient_bottom").value = bCol;
                 
+                // Specific layer color sets
                 const eT = vmi.color("gradient_top_error"); if(eT) eT.value = toRive('--error-dark');
                 const eB = vmi.color("gradient_bottom_error"); if(eB) eB.value = toRive('--error-mid');
                 const sT = vmi.color("gradient_top_success"); if(sT) sT.value = toRive('--success-dark');
@@ -115,35 +127,46 @@ function loadRive(docType) {
     });
 }
 
+/**
+ * Sensor logic to differentiate hand vs table
+ */
 function handleSensors(event) {
     if (!isTrueMobile() || currentState === "verification" || currentState === "success") return;
 
     const acc = event.acceleration;
     const rawMovement = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
+    
+    // Low-Pass Filter for the progress bar logic
     smoothedMovement = (smoothedMovement * (1 - SMOOTHING_FACTOR)) + (rawMovement * SMOOTHING_FACTOR);
 
     window.ondeviceorientation = (orient) => {
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
 
         if (isFlat) {
-            if (smoothedMovement < HAND_STILLNESS_MIN) {
+            // 1. TABLE DETECTION (Error)
+            // Use raw movement to detect immediate stillness
+            if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
-                if (stillnessBuffer > 15) {
+                if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
                     pauseTimer();
                     updateUI("error");
                 }
             } 
-            else if (smoothedMovement >= HAND_STILLNESS_MIN && smoothedMovement <= HAND_STILLNESS_MAX) {
-                stillnessBuffer = 0;
+            // 2. HANDHELD DETECTION (Keep Still)
+            // Movement is between table floor and sober sway max
+            else if (rawMovement >= TABLE_THRESHOLD && smoothedMovement <= HAND_STILLNESS_MAX) {
+                stillnessBuffer = 0; 
                 if (currentState === "error" || currentState === "balance") updateUI("keeping_still");
                 if (!successTriggered) startTimer();
             }
+            // 3. TOO MUCH MOVEMENT
             else {
                 stillnessBuffer = 0;
                 pauseTimer();
                 if (currentState === "keeping_still") updateUI("balance");
             }
         } else {
+            // NOT FLAT
             stillnessBuffer = 0;
             pauseTimer();
             if (currentState === "error" || currentState === "keeping_still") updateUI("balance");
@@ -154,7 +177,7 @@ function handleSensors(event) {
 function startTimer() {
     if (timerInterval || successTriggered) return;
     timerInterval = setInterval(() => {
-        progress += 0.5; 
+        progress += 0.5; // Total 20 seconds
         progressBar.style.width = progress + '%';
         if (progress >= 100) {
             clearInterval(timerInterval);
@@ -172,6 +195,9 @@ function pauseTimer() {
     }
 }
 
+/**
+ * Button listener with iOS permission prompt
+ */
 mainBtn.addEventListener('click', () => {
     if (currentState === "verification") {
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
@@ -188,4 +214,5 @@ mainBtn.addEventListener('click', () => {
     }
 });
 
+// Initial Load
 updateUI("verification");
