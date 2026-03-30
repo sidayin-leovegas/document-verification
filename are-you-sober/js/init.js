@@ -8,10 +8,11 @@ let progress = 0;
 let successTriggered = false;
 let timerInterval = null;
 
-// Sensitivity & Stability
+// Detection Thresholds
 const FLAT_LIMIT = 5; 
-const JITTER_FLOOR = 0.08; // Lowered slightly to require more "stillness" for table detection
-let errorDebounceTimer = null; // New: prevents instant error firing
+const HAND_TREMOR_THRESHOLD = 0.15; // Movement above this is a human hand
+const SURFACE_STILLNESS_THRESHOLD = 0.05; // Movement below this is a static surface
+let stillnessBuffer = 0; // Tracks how long the device has been "surface-level" still
 
 const getRiveColor = (variable) => {
     const color = getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
@@ -23,11 +24,9 @@ function updateAnimation(type) {
     if (currentState === type) return; 
     currentState = type;
 
-    // Default BetMGM/Verification Colors
     let tCol = getRiveColor('--primary-400');
     let bCol = getRiveColor('--primary-300');
 
-    // Override colors based on state
     if (type === "error") {
         tCol = getRiveColor('--error-dark');
         bCol = getRiveColor('--error-mid');
@@ -45,38 +44,25 @@ function updateAnimation(type) {
         autoplay: true,
         onLoad: () => {
             r.resizeDrawingSurfaceToCanvas();
-            try {
-                const vm = r.viewModelByName('ViewModel1');
-                const vmi = vm.defaultInstance();
+            const vmi = r.viewModelByName('ViewModel1')?.defaultInstance();
+            if (vmi) {
+                r.bindViewModelInstance(vmi);
+                vmi.string('document_type').value = type;
 
-                if (vmi) {
-                    r.bindViewModelInstance(vmi);
-                    vmi.string('document_type').value = type;
+                // Set Primary Gradients
+                vmi.color("gradient_top").value = tCol;
+                vmi.color("gradient_bottom").value = bCol;
 
-                    // 1. Set global gradient inputs
-                    vmi.color("gradient_top").value = tCol;
-                    vmi.color("gradient_bottom").value = bCol;
-
-                    // 2. Explicitly set state-specific colors as requested
-                    const errorTop = vmi.color(`gradient_top_error`);
-                    const errorBottom = vmi.color(`gradient_bottom_error`);
-                    const successTop = vmi.color(`gradient_top_success`);
-                    const successBottom = vmi.color(`gradient_bottom_success`);
-
-                    // Map the current active colors to the specific Rive slots
-                    if (type === "error") {
-                        if (errorTop) errorTop.value = tCol;
-                        if (errorBottom) errorBottom.value = bCol;
-                    }
-                    if (type === "success") {
-                        if (successTop) successTop.value = tCol;
-                        if (successBottom) successBottom.value = bCol;
-                    }
-
-                    r.play('State Machine 1');
+                // Explicitly target state-specific colors
+                if (type === "error") {
+                    vmi.color("gradient_top_error").value = tCol;
+                    vmi.color("gradient_bottom_error").value = bCol;
                 }
-            } catch (e) {
-                console.error('[Rive] VMI Error:', e.message);
+                if (type === "success") {
+                    vmi.color("gradient_top_success").value = tCol;
+                    vmi.color("gradient_bottom_success").value = bCol;
+                }
+                r.play('State Machine 1');
             }
         }
     });
@@ -84,50 +70,47 @@ function updateAnimation(type) {
 
 function handleSensors(event) {
     const acc = event.acceleration;
-    const movement = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
+    // Calculate total movement magnitude
+    const movement = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
 
     window.ondeviceorientation = (orient) => {
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
 
-        // TABLE DETECTION (Error) with 500ms stabilization
-        if (isFlat && movement < JITTER_FLOOR) {
-            if (!errorDebounceTimer && currentState !== "error") {
-                errorDebounceTimer = setTimeout(() => {
+        if (isFlat) {
+            if (movement < SURFACE_STILLNESS_THRESHOLD) {
+                // Potential Static Surface detected. Increase stillness buffer.
+                stillnessBuffer++;
+                if (stillnessBuffer > 20) { // Approx 300ms of absolute stillness
                     stopSuccessTimer();
                     updateAnimation("error");
-                }, 500); // Must be still for half a second
+                }
+            } else if (movement > HAND_TREMOR_THRESHOLD) {
+                // Handheld Flat detected (Biological noise present)
+                stillnessBuffer = 0;
+                if (currentState === "error") updateAnimation("verification");
+                if (!successTriggered) startSuccessTimer();
             }
-        } 
-        // HANDHELD DETECTION (Success)
-        else if (isFlat && movement >= JITTER_FLOOR && !successTriggered) {
-            clearErrorDebounce();
-            if (currentState === "error") updateAnimation("verification");
-            startSuccessTimer();
-        } 
-        // RESET
-        else {
-            clearErrorDebounce();
+        } else {
+            // Not flat - Reset everything
+            stillnessBuffer = 0;
             stopSuccessTimer();
-            if (currentState === "error") updateAnimation("verification");
+            if (currentState === "error" || currentState === "success") {
+                successTriggered = false;
+                updateAnimation("verification");
+            }
         }
     };
 }
 
-function clearErrorDebounce() {
-    if (errorDebounceTimer) {
-        clearTimeout(errorDebounceTimer);
-        errorDebounceTimer = null;
-    }
-}
-
 function startSuccessTimer() {
-    if (timerInterval) return;
+    if (timerInterval || successTriggered) return;
     loaderContainer.style.display = 'block';
     timerInterval = setInterval(() => {
         progress += 2; 
         progressBar.style.width = progress + '%';
         if (progress >= 100) {
             clearInterval(timerInterval);
+            timerInterval = null;
             successTriggered = true;
             updateAnimation("success");
             alert("success");
@@ -136,8 +119,10 @@ function startSuccessTimer() {
 }
 
 function stopSuccessTimer() {
-    clearInterval(timerInterval);
-    timerInterval = null;
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
     progress = 0;
     progressBar.style.width = '0%';
     loaderContainer.style.display = 'none';
