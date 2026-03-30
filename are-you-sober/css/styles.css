@@ -1,73 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;700&display=swap');
+
 :root {
+    /* Brand Defaults: BetMGM */
     --primary-500: #b19661;
     --primary-400: #bda679;
     --primary-300: #c8b690;
     --font: "Sofia Sans", sans-serif;
     --default-bg: #f1f0ec;
     --paper: #ffffff;
-    --spaceunit: 8px;
+    --body-text: #000000;
     
+    /* Layout Units */
+    --spaceunit: 8px;
+    --soft-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+    /* Success Color Scale */
     --success-dark: #224543;
     --success-mid: #008C71;
+    --success-light: #D6EAE6;
+
+    /* Error Color Scale */
     --error-dark: #B62D20;
     --error-mid: #D33C2D;
+    --error-light: #FDE3E0;
+
+    /* Dynamic Backgrounds for Animation Container */
+    --bg-top: var(--primary-400);
+    --bg-bottom: var(--primary-300);
+}
+
+* {
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #000000; /* Dark background to make the card pop like Figma */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Aligns container to the top */
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Container at the top */
-    padding-top: calc(var(--spaceunit) * 2); /* 2x spaceunit from top */
-    background-color: #000; /* Dark background like Figma */
+    padding-top: calc(var(--spaceunit) * 2); /* 2x spaceunit from top of screen */
 }
 
+/* --- Main Card Container --- */
 .container {
     width: 90%;
     max-width: 400px;
+    padding: calc(var(--spaceunit) * 3);
     background-color: var(--default-bg);
     border-radius: 16px;
-    padding: calc(var(--spaceunit) * 3);
+    box-shadow: var(--soft-elevation);
+    display: flex;
+    flex-direction: column;
     text-align: center;
 }
 
+/* --- Rive Animation Wrapper --- */
+.top-animation {
+    width: 100%;
+    margin-bottom: calc(var(--spaceunit) * 2);
+    border-radius: 12px;
+    background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+    overflow: hidden;
+    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#mainCanvas {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: block;
+    height: auto;
+}
+
+/* --- Typography --- */
 #ui-title {
     font-family: var(--font);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
-    margin: 16px 0 8px;
+    color: var(--body-text);
+    margin: 16px 0 8px 0;
 }
 
 #ui-body {
     font-family: var(--font);
-    font-size: 14px;
-    color: #333;
-    line-height: 1.4;
-    margin-bottom: 24px;
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.5;
+    margin: 0 0 24px 0;
 }
 
-#main-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--primary-500);
-    color: white;
-    border: none;
-    border-radius: 20px;
+#ui-body b {
     font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-transform: uppercase;
 }
 
+/* --- Progress Loader --- */
 #loader-container {
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: #d1d1d1;
-    margin-top: 10px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
 }
 
 #progress-bar {
     width: 0%;
     height: 100%;
-    background: #008C71;
+    background: var(--success-mid);
     transition: width 0.1s linear;
+}
+
+/* --- Action Button --- */
+#main-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: var(--primary-500);
+    color: #ffffff;
+    border: none;
+    border-radius: 24px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(177, 150, 97, 0.3);
+}
+
+#main-btn:active {
+    transform: scale(0.98);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: calc(var(--spaceunit) * 2);
+    }
 }
