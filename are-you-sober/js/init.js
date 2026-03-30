@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "March 30, 2026 - 16:55"; 
+const JS_VERSION_TIME = "March 30, 2026 - 17:05"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -23,7 +23,7 @@ let smoothedMovement = 0;
 
 const TABLE_THRESHOLD = 0.07;    
 const HAND_STILLNESS_MAX = 0.35; 
-const STILLNESS_REQUIRED_FRAMES = 25; // Slightly longer buffer for stability
+const STILLNESS_REQUIRED_FRAMES = 25; 
 
 const isTrueMobile = () => {
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -43,7 +43,6 @@ function displayVersion() {
 
 function updateUI(state) {
     if (!isTrueMobile()) state = "desktop";
-    // Prevention: Don't re-trigger the same state unless it's a forced reset
     if (currentState === state && state !== "balance") return;
     
     currentState = state;
@@ -54,31 +53,36 @@ function updateUI(state) {
     switch(state) {
         case "desktop":
             uiTitle.style.display = "none";
-            uiBody.innerText = "Please use a mobile device to test this feature";
+            uiBody.innerText = "Please open this page on a mobile device to complete the verification.";
             break;
+
         case "verification":
-            uiTitle.innerText = "How are we feeling this evening?";
-            uiBody.innerText = "We want to be sure you have a sober and safe experience before continuing with your deposit.";
-            mainBtn.innerText = "CONTINUE";
+            uiTitle.innerText = "Safety Check";
+            uiBody.innerText = "To ensure a safe gaming experience, please complete this brief balance verification before your deposit.";
+            mainBtn.innerText = "START CHECK";
             mainBtn.style.display = "block";
             break;
+            
         case "balance":
             uiTitle.style.display = "none";
-            uiBody.innerHTML = "<b>Please hold your mobile device flat in your hand for 20 seconds.</b>";
+            uiBody.innerHTML = "<b>Level your device and hold it flat in your palm.</b>";
             break;
+            
         case "keeping_still":
             uiTitle.style.display = "none";
-            uiBody.innerHTML = "<b>Please keep still ...</b>";
+            uiBody.innerHTML = "<b>Hold steady... keep your device level for 20 seconds.</b>";
             loaderContainer.style.display = "block";
             break;
+            
         case "error":
             uiTitle.style.display = "none";
-            uiBody.innerHTML = "<b>Do not put your device down on a table or surface. Pick up your device to continue.</b>";
+            uiBody.innerHTML = "<b>Surface detected. Please pick up your device and hold it in your hand to continue.</b>";
             break;
+            
         case "success":
-            uiTitle.innerText = "Success!";
-            uiBody.innerText = "Check completed. Please continue with your deposit and have a wonderful evening!";
-            mainBtn.innerText = "DEPOSIT";
+            uiTitle.innerText = "Verification Complete";
+            uiBody.innerText = "Thank you. Your check is successful. You may now proceed with your deposit.";
+            mainBtn.innerText = "GO TO DEPOSIT";
             mainBtn.style.display = "block";
             break;
     }
@@ -132,14 +136,13 @@ function handleSensors(event) {
     window.ondeviceorientation = (orient) => {
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
 
-        // If we are already in Error, we ONLY look for the "Pickup" action
         if (currentState === "error") {
-            // Picked up = Device is no longer flat OR significant movement detected
-            if (!isFlat || rawMovement > 0.15) {
+            // Sensitivity to detect pick-up from table
+            if (!isFlat || rawMovement > 0.18) {
                 stillnessBuffer = 0;
                 updateUI("balance"); 
             }
-            return; // Lockdown: Ignore other logic while in Error
+            return; 
         }
 
         if (isFlat) {
@@ -202,6 +205,9 @@ mainBtn.addEventListener('click', () => {
             window.addEventListener('devicemotion', handleSensors);
             updateUI("balance");
         }
+    } else if (currentState === "success") {
+        // Logic for redirect or action
+        console.log("Proceeding to deposit...");
     }
 });
 
