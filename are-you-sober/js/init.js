@@ -1,26 +1,14 @@
 let r;
 const canvas = document.getElementById('mainCanvas');
+let isOnTable = false;
 let flatTimer = null;
-let isCurrentlyFlat = false;
-let lastState = "verification";
 
-// Sensitivity thresholds
-const FLAT_THRESHOLD = 5; // Degrees from 0 to be considered "flat"
-const MOTION_THRESHOLD = 0.5; // Change in degrees to consider "moving"
-let lastBeta = 0;
-let lastGamma = 0;
-
-function cssToRiveColor(cssColor) {
-    const cleanHex = cssColor.replace('#', '').trim();
-    return parseInt(`0xFF${cleanHex}`, 16);
-}
+// Thresholds
+const FLAT_ANGLE = 5; 
+const MOTION_THRESHOLD = 0.05; // Adjust this to fine-tune "hand jitters"
 
 function initRive(docType = "verification") {
     if (r) r.cleanup();
-    lastState = docType;
-
-    const topColor = cssToRiveColor("#7f39fb");
-    const bottomColor = cssToRiveColor("#985eff");
 
     r = new rive.Rive({
         src: 'assets/document_requst_animation.riv',
@@ -34,71 +22,66 @@ function initRive(docType = "verification") {
             const vmi = r.viewModelByName('ViewModel1')?.defaultInstance();
             if (vmi) {
                 r.bindViewModelInstance(vmi);
-                vmi.string('document_type').value = docType;
-                vmi.color("gradient_top").value = topColor;
-                vmi.color("gradient_bottom").value = bottomColor;
+                
+                // Force the string value to the requested state
+                const docTypeProp = vmi.string('document_type');
+                if (docTypeProp) {
+                    docTypeProp.value = docType;
+                }
+                
+                // Ensure colors are also set for the error/success states
+                vmi.color("gradient_top").value = cssToRiveColor("#7f39fb");
+                vmi.color("gradient_bottom").value = cssToRiveColor("#985eff");
+                
                 r.play('State Machine 1');
             }
         }
     });
 }
 
-function handleOrientation(event) {
-    const beta = event.beta;   // -180 to 180 (front/back)
-    const gamma = event.gamma; // -90 to 90 (left/right)
+function handleMotion(event) {
+    const acc = event.acceleration; // Acceleration EXCLUDING gravity
+    const totalMovement = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
 
-    // Check if device is flat (approx 0,0)
-    const isFlat = Math.abs(beta) < FLAT_THRESHOLD && Math.abs(gamma) < FLAT_THRESHOLD;
-    
-    // Check if device is static
-    const isMoving = Math.abs(beta - lastBeta) > MOTION_THRESHOLD || Math.abs(gamma - lastGamma) > MOTION_THRESHOLD;
-    
-    lastBeta = beta;
-    lastGamma = gamma;
-
-    // Logic: Put down on static flat surface -> Error
-    if (isFlat && !isMoving && lastState !== "error") {
-        initRive("error");
-        alert("error");
-        clearTimeout(flatTimer);
-        return;
-    }
-
-    // Logic: Picked up from static -> Back to Verification
-    if (!isFlat && lastState === "error") {
-        initRive("verification");
-    }
-
-    // Logic: Holding flat for 5 seconds -> Success
-    if (isFlat && isMoving) {
-        if (!isCurrentlyFlat) {
-            isCurrentlyFlat = true;
-            flatTimer = setTimeout(() => {
-                initRive("success");
-                alert("success");
-            }, 5000);
-        }
-    } else {
-        isCurrentlyFlat = false;
-        clearTimeout(flatTimer);
-    }
+    // Get rotation to check if it's flat
+    // Note: We use a global variable or separate listener for orientation
 }
 
-// Permission Request & Init
-document.getElementById('start-btn').addEventListener('click', () => {
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission()
-            .then(permissionState => {
-                if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                    document.getElementById('sensor-overlay').style.display = 'none';
-                    initRive("verification");
-                }
-            });
-    } else {
-        // Desktop or non-iOS
-        window.addEventListener('deviceorientation', handleOrientation);
-        document.getElementById('sensor-overlay').style.display = 'none';
-        initRive("verification");
-    }
+window.addEventListener('deviceorientation', (e) => {
+    const isFlat = Math.abs(e.beta) < FLAT_ANGLE && Math.abs(e.gamma) < FLAT_ANGLE;
+    
+    // We'll use devicemotion to check the "stillness"
+    window.ondevicemotion = (m) => {
+        const acc = m.acceleration;
+        const stillness = Math.abs(acc.x) + Math.abs(acc.y) + Math.abs(acc.z);
+
+        // CASE 1: ON A TABLE (Flat + Zero Movement)
+        if (isFlat && stillness < MOTION_THRESHOLD) {
+            if (!isOnTable) {
+                isOnTable = true;
+                initRive("error");
+                alert("Error: Device placed on flat surface.");
+            }
+        } 
+        
+        // CASE 2: PICKED UP (Not Flat or Significant Movement)
+        else if (!isFlat || stillness > MOTION_THRESHOLD) {
+            if (isOnTable) {
+                isOnTable = false;
+                initRive("verification");
+            }
+        }
+
+        // CASE 3: SUCCESS (Flat + Hand Jitters)
+        // If it's flat but STILLNESS is > threshold, they are holding it flat
+        if (isFlat && stillness >= MOTION_THRESHOLD && !flatTimer) {
+             flatTimer = setTimeout(() => {
+                 initRive("success");
+                 alert("Success: Held flat for 5s");
+             }, 5000);
+        } else if (!isFlat) {
+            clearTimeout(flatTimer);
+            flatTimer = null;
+        }
+    };
 });
