@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "March 30, 2026 - 17:05"; 
+const JS_VERSION_TIME = "March 30, 2026 - 17:15"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -43,6 +43,9 @@ function displayVersion() {
 
 function updateUI(state) {
     if (!isTrueMobile()) state = "desktop";
+    
+    // Lock logic: If we are already successful, do not allow any other state changes
+    if (successTriggered && state !== "success") return;
     if (currentState === state && state !== "balance") return;
     
     currentState = state;
@@ -53,13 +56,13 @@ function updateUI(state) {
     switch(state) {
         case "desktop":
             uiTitle.style.display = "none";
-            uiBody.innerText = "Please open this page on a mobile device to complete the verification.";
+            uiBody.innerText = "Please open this page on a mobile device to test this feature";
             break;
 
         case "verification":
-            uiTitle.innerText = "Safety Check";
-            uiBody.innerText = "To ensure a safe gaming experience, please complete this brief balance verification before your deposit.";
-            mainBtn.innerText = "START CHECK";
+            uiTitle.innerText = "How are we feeling this evening?";
+            uiBody.innerText = "We want to be sure you have a sober and safe experience before continuing with your deposit.";
+            mainBtn.innerText = "CONTINUE";
             mainBtn.style.display = "block";
             break;
             
@@ -80,9 +83,9 @@ function updateUI(state) {
             break;
             
         case "success":
-            uiTitle.innerText = "Verification Complete";
-            uiBody.innerText = "Thank you. Your check is successful. You may now proceed with your deposit.";
-            mainBtn.innerText = "GO TO DEPOSIT";
+            uiTitle.innerText = "Success!";
+            uiBody.innerText = "Check completed. Please continue with your deposit and have a wonderful evening!";
+            mainBtn.innerText = "DEPOSIT";
             mainBtn.style.display = "block";
             break;
     }
@@ -127,17 +130,21 @@ function loadRive(docType) {
 }
 
 function handleSensors(event) {
-    if (!isTrueMobile() || currentState === "verification" || currentState === "success") return;
+    // CRITICAL: Stop all sensor processing once success is achieved
+    if (successTriggered || !isTrueMobile()) return;
+    if (currentState === "verification") return;
 
     const acc = event.acceleration;
     const rawMovement = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
     smoothedMovement = (smoothedMovement * (1 - SMOOTHING_FACTOR)) + (rawMovement * SMOOTHING_FACTOR);
 
     window.ondeviceorientation = (orient) => {
+        // Double-check success lock inside the orientation handler
+        if (successTriggered) return;
+
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
 
         if (currentState === "error") {
-            // Sensitivity to detect pick-up from table
             if (!isFlat || rawMovement > 0.18) {
                 stillnessBuffer = 0;
                 updateUI("balance"); 
@@ -205,9 +212,6 @@ mainBtn.addEventListener('click', () => {
             window.addEventListener('devicemotion', handleSensors);
             updateUI("balance");
         }
-    } else if (currentState === "success") {
-        // Logic for redirect or action
-        console.log("Proceeding to deposit...");
     }
 });
 
