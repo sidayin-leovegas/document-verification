@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "March 30, 2026 - 16:45"; // Manual timestamp
+const JS_VERSION_TIME = "March 30, 2026 - 16:47"; // Manual timestamp
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -25,7 +25,9 @@ const TABLE_THRESHOLD = 0.07;
 const HAND_STILLNESS_MAX = 0.30; 
 const STILLNESS_REQUIRED_FRAMES = 20; 
 
-/** * Mobile & Sensor Detection */
+/** * Mobile & Sensor Detection 
+ * Checks for hardware presence to separate desktop inspect mode
+ */
 const isTrueMobile = () => {
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const hasSensors = typeof DeviceOrientationEvent !== 'undefined';
@@ -54,27 +56,34 @@ function updateUI(state) {
     switch(state) {
         case "desktop":
             uiTitle.style.display = "none";
-            uiBody.innerText = "Please use a mobile device for test this feature";
+            // FIXED: Changed "for test" to "to test"
+            uiBody.innerText = "Please use a mobile device to test this feature";
+            mainBtn.style.display = "none";
             break;
+
         case "verification":
             uiTitle.innerText = "How are we feeling this evening?";
             uiBody.innerText = "We want to sure you have a sober and safe experience fore continuing with your deposit.";
             mainBtn.innerText = "CONTINUE";
             mainBtn.style.display = "block";
             break;
+            
         case "balance":
             uiTitle.style.display = "none";
             uiBody.innerHTML = "<b>Please hold your mobile device flat in your hand for 20 seconds.</b>";
             break;
+            
         case "keeping_still":
             uiTitle.style.display = "none";
             uiBody.innerHTML = "<b>Please keep still ...</b>";
             loaderContainer.style.display = "block";
             break;
+            
         case "error":
             uiTitle.style.display = "none";
             uiBody.innerHTML = "<b>Do not put your device down on a table or surface. Pick up your device to continue.</b>";
             break;
+            
         case "success":
             uiTitle.innerText = "Success!";
             uiBody.innerText = "Check completed. Please continue with your deposit and have a wonderful evening!";
@@ -134,6 +143,7 @@ function handleSensors(event) {
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
 
         if (isFlat) {
+            // TABLE DETECTION
             if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
                 if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
@@ -141,6 +151,7 @@ function handleSensors(event) {
                     updateUI("error");
                 }
             } 
+            // HANDHELD DETECTION
             else if (rawMovement >= TABLE_THRESHOLD && smoothedMovement <= HAND_STILLNESS_MAX) {
                 stillnessBuffer = 0; 
                 if (currentState === "error" || currentState === "balance") updateUI("keeping_still");
@@ -183,6 +194,7 @@ function pauseTimer() {
 mainBtn.addEventListener('click', () => {
     if (currentState === "verification") {
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
+            // iOS 13+ permission flow
             DeviceMotionEvent.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     window.addEventListener('devicemotion', handleSensors);
@@ -196,6 +208,5 @@ mainBtn.addEventListener('click', () => {
     }
 });
 
-// Run Version Display and initial UI load
 displayVersion();
 updateUI("verification");

@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;700&display=swap');
 
 :root {
-    /* Brand Defaults: BetMGM */
     --primary-500: #b19661;
     --primary-400: #bda679;
     --primary-300: #c8b690;
@@ -9,127 +8,58 @@
     --default-bg: #f1f0ec;
     --paper: #ffffff;
     --body-text: #000000;
-    
-    /* Layout Units */
     --spaceunit: 8px;
     --soft-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-
-    /* Success Color Scale */
     --success-dark: #224543;
     --success-mid: #008C71;
-
-    /* Error Color Scale */
     --error-dark: #B62D20;
     --error-mid: #D33C2D;
-
-    /* Dynamic Backgrounds */
     --bg-top: var(--primary-400);
     --bg-bottom: var(--primary-300);
 }
 
-* {
-    box-sizing: border-box;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-}
+* { box-sizing: border-box; }
 
 body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh;
+    margin: 0; padding: 0; width: 100%; min-height: 100vh;
     background-color: #000000; 
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; 
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
 }
 
-body {
-    padding-top: calc(var(--spaceunit) * 2); 
-}
+body { padding-top: calc(var(--spaceunit) * 2); }
 
 .container {
-    width: 90%;
-    max-width: 400px;
+    width: 90%; max-width: 400px;
     padding: calc(var(--spaceunit) * 3);
     background-color: var(--default-bg);
     border-radius: 16px;
     box-shadow: var(--soft-elevation);
-    display: flex;
-    flex-direction: column;
-    text-align: center;
+    display: flex; flex-direction: column; text-align: center;
 }
 
 .top-animation {
-    width: 100%;
-    margin-bottom: calc(var(--spaceunit) * 2);
+    width: 100%; margin-bottom: calc(var(--spaceunit) * 2);
     border-radius: 12px;
     background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
     overflow: hidden;
 }
 
-#mainCanvas {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    display: block;
-}
+#mainCanvas { width: 100%; aspect-ratio: 16 / 9; display: block; }
 
-#ui-title {
-    font-family: var(--font);
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--body-text);
-    margin: 16px 0 8px 0;
-}
+#ui-title { font-family: var(--font); font-size: 22px; font-weight: 700; margin: 16px 0 8px 0; }
 
-#ui-body {
-    font-family: var(--font);
-    font-size: 15px;
-    color: #333333;
-    line-height: 1.5;
-    margin: 0 0 24px 0;
-}
+#ui-body { font-family: var(--font); font-size: 15px; color: #333; line-height: 1.5; margin: 0 0 24px 0; }
 
-#loader-container {
-    width: 100%;
-    height: 6px;
-    background: #d1d1d1;
-    border-radius: 10px;
-    margin-bottom: 24px;
-    overflow: hidden;
-}
+#loader-container { width: 100%; height: 6px; background: #d1d1d1; border-radius: 10px; margin-bottom: 24px; overflow: hidden; }
 
-#progress-bar {
-    width: 0%;
-    height: 100%;
-    background: var(--success-mid);
-    transition: width 0.1s linear;
-}
+#progress-bar { width: 0%; height: 100%; background: var(--success-mid); transition: width 0.1s linear; }
 
 #main-btn {
-    width: 100%;
-    padding: 16px;
-    background-color: var(--primary-500);
-    color: #000000; /* Black Text */
-    border: none;
-    border-radius: 24px;
-    font-family: var(--font);
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
+    width: 100%; padding: 16px;
+    background-color: var(--primary-500); color: #000;
+    border: none; border-radius: 24px;
+    font-family: var(--font); font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
 }
 
-#main-btn:active {
-    transform: scale(0.98);
-}
-
-#version-tag {
-    width: 100%;
-    text-align: center;
-    font-family: var(--font);
-    font-size: 11px;
-    color: #333333; /* Requested color */
-    margin-top: 12px;
-    opacity: 0.8;
-}
+#version-tag { text-align: center; font-family: var(--font); font-size: 11px; color: #333333; margin-top: 12px; opacity: 0.8; }
