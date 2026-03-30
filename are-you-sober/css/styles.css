@@ -39,14 +39,14 @@ body, html {
     padding: 0;
     width: 100%;
     min-height: 100vh;
-    background-color: #000000; /* Dark background to make the card pop like Figma */
+    background-color: #000000; 
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Aligns container to the top */
+    align-items: flex-start; 
 }
 
 body {
-    padding-top: calc(var(--spaceunit) * 2); /* 2x spaceunit from top of screen */
+    padding-top: calc(var(--spaceunit) * 2); 
 }
 
 /* --- Main Card Container --- */
@@ -122,7 +122,7 @@ body {
     width: 100%;
     padding: 16px;
     background-color: var(--primary-500);
-    color: #ffffff;
+    color: #000000; /* Set to Black */
     border: none;
     border-radius: 24px;
     font-family: var(--font);
@@ -131,7 +131,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(177, 150, 97, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Slightly darker shadow for contrast */
 }
 
 #main-btn:active {
