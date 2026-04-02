@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 21:15"; 
+const JS_VERSION_TIME = "April 02, 2026 - 22:30"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -9,8 +9,10 @@ const mainBtn = document.getElementById('main-btn');
 const loaderContainer = document.getElementById('loader-container');
 const progressBar = document.getElementById('progress-bar');
 const versionTag = document.getElementById('version-tag');
+const qrContainer = document.getElementById('qr-container');
+const qrImage = document.getElementById('qr-image');
 
-// --- Gamification Settings (Updated Times) ---
+// --- Gamification Settings ---
 let currentLevel = 1;
 let isLevelActive = false; 
 let levelStartTime = 0; 
@@ -31,7 +33,6 @@ let successTriggered = false;
 const FLAT_LIMIT = 10;           
 const SMOOTHING_FACTOR = 0.12;   
 let smoothedMovement = 0;
-
 const TABLE_THRESHOLD = 0.08;    
 const HAND_STILLNESS_MAX = 0.40; 
 const STILLNESS_REQUIRED_FRAMES = 15; 
@@ -46,15 +47,33 @@ const isTrueMobile = () => {
 const getHex = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const toRive = (v) => parseInt(`0xFF${getHex(v).replace('#', '')}`, 16);
 
+function generateQR() {
+    if (qrContainer && qrImage) {
+        const currentUrl = window.location.href;
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+        // Force display to override inline HTML styles
+        qrContainer.style.setProperty('display', 'inline-flex', 'important');
+    }
+}
+
 function updateUI(state) {
     if (!isTrueMobile()) state = "desktop";
     currentState = state;
     loaderContainer.style.display = "none";
     uiTitle.style.display = "block";
     mainBtn.style.display = "none";
+    
+    // Reset QR visibility on every state change to prevent mobile leakage
+    if (qrContainer) qrContainer.style.display = "none";
+
     const lvl = levels[currentLevel];
 
     switch(state) {
+        case "desktop":
+            uiTitle.style.display = "none";
+            uiBody.innerText = "This challenge requires motion sensors. Scan the code below to join the party on your mobile device!";
+            generateQR();
+            break;
         case "verification":
             uiTitle.innerText = "Ready to join the party?";
             uiBody.innerText = "Before we pour another round of fun, let’s test those reflexes. Pass 3 levels of balance to unlock your deposit!";
@@ -100,10 +119,9 @@ function updateUI(state) {
             break;
     }
     
-    let rivType = state;
-    if (state === "keeping_still") rivType = "keep";
-    if (state === "surface_error" || state === "wobble_error") rivType = "error";
-    if (state === "level_success") rivType = "success";
+    let rivType = (state === "keeping_still") ? "keep" : 
+                  (state === "surface_error" || state === "wobble_error") ? "error" :
+                  (state === "level_success") ? "success" : state;
     loadRive(rivType);
 }
 
@@ -124,14 +142,13 @@ function loadRive(docType) {
                 r.bindViewModelInstance(vmi);
                 vmi.string('document_type').value = rivType;
                 
-                // Color injection: Cocktail color + Gradient Overrides
-                if (vmi.color("cocktail_color")) {
-                    vmi.color("cocktail_color").value = toRive('--primary-500');
-                }
+                // Color Injection
+                if (vmi.color("cocktail_color")) vmi.color("cocktail_color").value = toRive('--primary-500');
 
                 let topColor = toRive(lvl.top);
                 let bottomColor = toRive(lvl.mid);
 
+                // Override background gradients for error/success screens
                 if (rivType === "error") {
                     topColor = toRive('--error-dark');
                     bottomColor = toRive('--error-mid');
@@ -143,6 +160,7 @@ function loadRive(docType) {
                 vmi.color("gradient_top").value = topColor;
                 vmi.color("gradient_bottom").value = bottomColor;
                 
+                // State-specific overrides
                 vmi.color("gradient_top_error").value = toRive('--error-dark');
                 vmi.color("gradient_bottom_error").value = toRive('--error-mid');
                 vmi.color("gradient_top_success").value = toRive('--success-dark');
@@ -156,7 +174,6 @@ function loadRive(docType) {
 
 function handleSensors(event) {
     if (successTriggered || !isTrueMobile() || !isLevelActive) return;
-
     const acc = event.acceleration;
     const rawMovement = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
     smoothedMovement = (smoothedMovement * (1 - SMOOTHING_FACTOR)) + (rawMovement * SMOOTHING_FACTOR);
@@ -167,16 +184,16 @@ function handleSensors(event) {
         const timeSinceStart = Date.now() - levelStartTime;
 
         if (isFlat) {
+            // Surface check
             if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
                 if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
                     failTest("surface_error");
                     return;
                 }
-            } else {
-                stillnessBuffer = 0;
-            }
+            } else { stillnessBuffer = 0; }
 
+            // Progress check
             if (smoothedMovement <= HAND_STILLNESS_MAX) {
                 if (currentState === "balance") updateUI("keeping_still");
                 startTimer();
@@ -185,12 +202,12 @@ function handleSensors(event) {
                 failTest("wobble_error");
             }
         } else {
-            if (progress > 0) {
-                 failTest("wobble_error");
-            } else {
-                 stillnessBuffer = 0;
-                 pauseTimer();
-                 if (currentState === "keeping_still") updateUI("balance");
+            // Failure on tilt
+            if (progress > 0) { failTest("wobble_error"); } 
+            else {
+                stillnessBuffer = 0;
+                pauseTimer();
+                if (currentState === "keeping_still") updateUI("balance");
             }
         }
     };

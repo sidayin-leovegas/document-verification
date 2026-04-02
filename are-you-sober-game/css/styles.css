@@ -65,3 +65,39 @@ body { padding-top: calc(var(--spaceunit) * 2); }
 }
 
 #version-tag { text-align: center; font-family: var(--font); font-size: 11px; color: #999; margin-top: 12px; }
+
+/* Ensure the wrapper is always ready to center its children */
+#qr-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    min-height: 200px; /* Prevents layout jump when QR loads */
+    margin: 20px 0;
+}
+
+/* This must match what JS sets to show the box */
+#qr-container {
+    display: none; /* JS will change this to inline-flex */
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#qr-image {
+    width: 160px;
+    height: 160px;
+    display: block;
+    border-radius: 8px;
+}
+
+#qr-text {
+    font-family: var(--font);
+    font-size: 12px;
+    color: #999999;
+    margin-top: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
