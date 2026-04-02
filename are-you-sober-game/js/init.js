@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 17:30"; 
+const JS_VERSION_TIME = "April 02, 2026 - 18:20"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -111,6 +111,7 @@ function loadRive(docType) {
     if (r) r.cleanup();
     let rivType = (docType === "initial") ? "verification" : docType;
     const lvl = levels[currentLevel];
+
     r = new rive.Rive({
         src: 'assets/document_requst_animation_41.riv',
         canvas: canvas,
@@ -122,12 +123,35 @@ function loadRive(docType) {
             if (vmi) {
                 r.bindViewModelInstance(vmi);
                 vmi.string('document_type').value = rivType;
-                vmi.color("gradient_top").value = toRive(lvl.top);
-                vmi.color("gradient_bottom").value = toRive(lvl.mid);
-                vmi.color("gradient_top_error").value = toRive('--error-dark');
-                vmi.color("gradient_bottom_error").value = toRive('--error-mid');
-                vmi.color("gradient_top_success").value = toRive('--success-dark');
-                vmi.color("gradient_bottom_success").value = toRive('--success-mid');
+                
+                // 1. Cocktail Accent (Verification Only)
+                if (vmi.color("cocktail_color")) {
+                    vmi.color("cocktail_color").value = toRive('--primary-500');
+                }
+
+                // 2. Base Background Gradients (Logic updated per Level)
+                const topBase = (rivType === "error") ? toRive('--error-dark') : 
+                                (rivType === "success") ? toRive('--success-dark') : toRive(lvl.top);
+                const midBase = (rivType === "error") ? toRive('--error-mid') : 
+                                (rivType === "success") ? toRive('--success-mid') : toRive(lvl.mid);
+
+                vmi.color("gradient_top").value = topBase;
+                vmi.color("gradient_bottom").value = midBase;
+                
+                // 3. Specific State Overrides
+                if (vmi.color("gradient_top_error")) {
+                    vmi.color("gradient_top_error").value = toRive('--error-dark');
+                }
+                if (vmi.color("gradient_bottom_error")) {
+                    vmi.color("gradient_bottom_error").value = toRive('--error-mid');
+                }
+                if (vmi.color("gradient_top_success")) {
+                    vmi.color("gradient_top_success").value = toRive('--success-dark');
+                }
+                if (vmi.color("gradient_bottom_success")) {
+                    vmi.color("gradient_bottom_success").value = toRive('--success-mid');
+                }
+
                 r.play('State Machine 1');
             }
         }
@@ -143,13 +167,10 @@ function handleSensors(event) {
 
     window.ondeviceorientation = (orient) => {
         if (!isLevelActive) return;
-        
-        // Check if the device is currently level
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
         const timeSinceStart = Date.now() - levelStartTime;
 
         if (isFlat) {
-            // Check for Surface/Table Detection
             if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
                 if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
@@ -160,24 +181,17 @@ function handleSensors(event) {
                 stillnessBuffer = 0;
             }
 
-            // Success Path: Device is level and hand is steady
             if (smoothedMovement <= HAND_STILLNESS_MAX) {
                 if (currentState === "balance") updateUI("keeping_still");
                 startTimer();
-            } 
-            // Failure Path: Device is level but hand is shaking too much
-            else {
-                if (timeSinceStart < 500) return; // Brief grace period for initial hand positioning
+            } else {
+                if (timeSinceStart < 500) return; 
                 failTest("wobble_error");
             }
         } else {
-            // Failure Path: Device is tilted during an active level
-            // If the timer has already started (progress > 0), any tilt is a fail.
             if (progress > 0) {
                  failTest("wobble_error");
-            } 
-            // If the user hasn't successfully leveled the phone yet, stay on balance screen.
-            else {
+            } else {
                  stillnessBuffer = 0;
                  pauseTimer();
                  if (currentState === "keeping_still") updateUI("balance");
