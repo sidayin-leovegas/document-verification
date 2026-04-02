@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 19:05"; 
+const JS_VERSION_TIME = "April 02, 2026 - 19:15"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -124,11 +124,7 @@ function loadRive(docType) {
                 r.bindViewModelInstance(vmi);
                 vmi.string('document_type').value = rivType;
                 
-                if (vmi.color("cocktail_color")) {
-                    vmi.color("cocktail_color").value = toRive('--primary-500');
-                }
-
-                // Base Colors based on Level or Overridden by Error/Success State
+                // Color Logic
                 let topColor = toRive(lvl.top);
                 let bottomColor = toRive(lvl.mid);
 
@@ -140,23 +136,14 @@ function loadRive(docType) {
                     bottomColor = toRive('--success-mid');
                 }
 
-                // 1. Set global background gradients
                 vmi.color("gradient_top").value = topColor;
                 vmi.color("gradient_bottom").value = bottomColor;
                 
-                // 2. Specific State Overrides
-                if (vmi.color("gradient_top_error")) {
-                    vmi.color("gradient_top_error").value = toRive('--error-dark');
-                }
-                if (vmi.color("gradient_bottom_error")) {
-                    vmi.color("gradient_bottom_error").value = toRive('--error-mid');
-                }
-                if (vmi.color("gradient_top_success")) {
-                    vmi.color("gradient_top_success").value = toRive('--success-dark');
-                }
-                if (vmi.color("gradient_bottom_success")) {
-                    vmi.color("gradient_bottom_success").value = toRive('--success-mid');
-                }
+                // State Specific Injections
+                vmi.color("gradient_top_error").value = toRive('--error-dark');
+                vmi.color("gradient_bottom_error").value = toRive('--error-mid');
+                vmi.color("gradient_top_success").value = toRive('--success-dark');
+                vmi.color("gradient_bottom_success").value = toRive('--success-mid');
 
                 r.play('State Machine 1');
             }
@@ -195,6 +182,7 @@ function handleSensors(event) {
                 failTest("wobble_error");
             }
         } else {
+            // Strict Fail: If timer is running and they tilt, it's a fail
             if (progress > 0) {
                  failTest("wobble_error");
             } else {
