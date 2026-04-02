@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 16:10"; 
+const JS_VERSION_TIME = "April 02, 2026 - 17:30"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -21,7 +21,7 @@ const levels = {
     3: { time: 20, top: '--info-dark', mid: '--info-mid', failTitle: "Uh-oh! Nearly there!", failBody: "Feeling a bit tipsy, are we? Focus! This is the final stretch." }
 };
 
-// --- Detection Settings (Strict Recalibration) ---
+// --- Detection Settings ---
 let currentState = "initial";
 let progress = 0;
 let timerInterval = null;
@@ -33,7 +33,7 @@ const SMOOTHING_FACTOR = 0.12;
 let smoothedMovement = 0;
 
 const TABLE_THRESHOLD = 0.08;    
-const HAND_STILLNESS_MAX = 0.40; // Strict handheld threshold
+const HAND_STILLNESS_MAX = 0.40; 
 const STILLNESS_REQUIRED_FRAMES = 15; 
 
 const isTrueMobile = () => {
@@ -143,11 +143,13 @@ function handleSensors(event) {
 
     window.ondeviceorientation = (orient) => {
         if (!isLevelActive) return;
+        
+        // Check if the device is currently level
         const isFlat = Math.abs(orient.beta) < FLAT_LIMIT && Math.abs(orient.gamma) < FLAT_LIMIT;
         const timeSinceStart = Date.now() - levelStartTime;
 
         if (isFlat) {
-            // Priority 1: Surface Check
+            // Check for Surface/Table Detection
             if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
                 if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
@@ -158,22 +160,24 @@ function handleSensors(event) {
                 stillnessBuffer = 0;
             }
 
-            // Priority 2: Keep Steady Check
+            // Success Path: Device is level and hand is steady
             if (smoothedMovement <= HAND_STILLNESS_MAX) {
                 if (currentState === "balance") updateUI("keeping_still");
                 startTimer();
-            } else {
-                // Ignore small shakes for first 500ms for initial placement
-                if (timeSinceStart < 500) return;
-                
-                // Active level failure: If user moves too much, fail immediately
+            } 
+            // Failure Path: Device is level but hand is shaking too much
+            else {
+                if (timeSinceStart < 500) return; // Brief grace period for initial hand positioning
                 failTest("wobble_error");
             }
         } else {
-            // Tilted: Immediate failure if timer was running, or return to balance UI
+            // Failure Path: Device is tilted during an active level
+            // If the timer has already started (progress > 0), any tilt is a fail.
             if (progress > 0) {
                  failTest("wobble_error");
-            } else {
+            } 
+            // If the user hasn't successfully leveled the phone yet, stay on balance screen.
+            else {
                  stillnessBuffer = 0;
                  pauseTimer();
                  if (currentState === "keeping_still") updateUI("balance");

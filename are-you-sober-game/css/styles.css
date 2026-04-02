@@ -38,6 +38,7 @@ body { padding-top: calc(var(--spaceunit) * 2); }
     background-color: var(--default-bg);
     border-radius: 16px;
     display: flex; flex-direction: column; text-align: center;
+    box-shadow: var(--soft-elevation);
 }
 
 .top-animation {
@@ -60,6 +61,7 @@ body { padding-top: calc(var(--spaceunit) * 2); }
     border: none; border-radius: 24px;
     font-family: var(--font); font-size: 14px; font-weight: 700;
     text-transform: uppercase; cursor: pointer;
+    letter-spacing: 1px;
 }
 
 #version-tag { text-align: center; font-family: var(--font); font-size: 11px; color: #999; margin-top: 12px; }
