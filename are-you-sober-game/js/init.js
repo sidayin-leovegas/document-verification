@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 18:20"; 
+const JS_VERSION_TIME = "April 02, 2026 - 19:05"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -124,21 +124,27 @@ function loadRive(docType) {
                 r.bindViewModelInstance(vmi);
                 vmi.string('document_type').value = rivType;
                 
-                // 1. Cocktail Accent (Verification Only)
                 if (vmi.color("cocktail_color")) {
                     vmi.color("cocktail_color").value = toRive('--primary-500');
                 }
 
-                // 2. Base Background Gradients (Logic updated per Level)
-                const topBase = (rivType === "error") ? toRive('--error-dark') : 
-                                (rivType === "success") ? toRive('--success-dark') : toRive(lvl.top);
-                const midBase = (rivType === "error") ? toRive('--error-mid') : 
-                                (rivType === "success") ? toRive('--success-mid') : toRive(lvl.mid);
+                // Base Colors based on Level or Overridden by Error/Success State
+                let topColor = toRive(lvl.top);
+                let bottomColor = toRive(lvl.mid);
 
-                vmi.color("gradient_top").value = topBase;
-                vmi.color("gradient_bottom").value = midBase;
+                if (rivType === "error") {
+                    topColor = toRive('--error-dark');
+                    bottomColor = toRive('--error-mid');
+                } else if (rivType === "success") {
+                    topColor = toRive('--success-dark');
+                    bottomColor = toRive('--success-mid');
+                }
+
+                // 1. Set global background gradients
+                vmi.color("gradient_top").value = topColor;
+                vmi.color("gradient_bottom").value = bottomColor;
                 
-                // 3. Specific State Overrides
+                // 2. Specific State Overrides
                 if (vmi.color("gradient_top_error")) {
                     vmi.color("gradient_top_error").value = toRive('--error-dark');
                 }
