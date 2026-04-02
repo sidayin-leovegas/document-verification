@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 19:15"; 
+const JS_VERSION_TIME = "April 02, 2026 - 19:30"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -10,15 +10,15 @@ const loaderContainer = document.getElementById('loader-container');
 const progressBar = document.getElementById('progress-bar');
 const versionTag = document.getElementById('version-tag');
 
-// --- Gamification Settings ---
+// --- Gamification Settings (Updated Times) ---
 let currentLevel = 1;
 let isLevelActive = false; 
 let levelStartTime = 0; 
 
 const levels = {
-    1: { time: 10, top: '--primary-400', mid: '--primary-300', failTitle: "Uh-oh!", failBody: "Feeling a bit tipsy, are we?" },
+    1: { time: 5, top: '--primary-400', mid: '--primary-300', failTitle: "Uh-oh!", failBody: "Feeling a bit tipsy, are we?" },
     2: { time: 15, top: '--warning-dark', mid: '--warning-mid', failTitle: "Uh-oh! Still wobbly?", failBody: "Feeling a bit tipsy, are we? Let's try to focus a bit harder." },
-    3: { time: 20, top: '--info-dark', mid: '--info-mid', failTitle: "Uh-oh! Nearly there!", failBody: "Feeling a bit tipsy, are we? Focus! This is the final stretch." }
+    3: { time: 25, top: '--info-dark', mid: '--info-mid', failTitle: "Uh-oh! Nearly there!", failBody: "Feeling a bit tipsy, are we? Focus! This is the final stretch." }
 };
 
 // --- Detection Settings ---
@@ -63,11 +63,11 @@ function updateUI(state) {
             break;
         case "balance":
             uiTitle.innerText = `Level ${currentLevel}`;
-            uiBody.innerHTML = "<b>Level your device and hold it flat in your palm.</b>";
+            uiBody.innerHTML = `<b>Level your device and hold it flat in your palm for ${lvl.time} seconds.</b>`;
             break;
         case "keeping_still":
             uiTitle.innerText = `Level ${currentLevel} in Progress`;
-            uiBody.innerHTML = "<b>Hold steady... do not move.</b>";
+            uiBody.innerHTML = `<b>Hold steady... keep level for ${lvl.time} seconds.</b>`;
             loaderContainer.style.display = "block";
             break;
         case "surface_error":
@@ -124,7 +124,6 @@ function loadRive(docType) {
                 r.bindViewModelInstance(vmi);
                 vmi.string('document_type').value = rivType;
                 
-                // Color Logic
                 let topColor = toRive(lvl.top);
                 let bottomColor = toRive(lvl.mid);
 
@@ -139,7 +138,6 @@ function loadRive(docType) {
                 vmi.color("gradient_top").value = topColor;
                 vmi.color("gradient_bottom").value = bottomColor;
                 
-                // State Specific Injections
                 vmi.color("gradient_top_error").value = toRive('--error-dark');
                 vmi.color("gradient_bottom_error").value = toRive('--error-mid');
                 vmi.color("gradient_top_success").value = toRive('--success-dark');
@@ -182,7 +180,6 @@ function handleSensors(event) {
                 failTest("wobble_error");
             }
         } else {
-            // Strict Fail: If timer is running and they tilt, it's a fail
             if (progress > 0) {
                  failTest("wobble_error");
             } else {
@@ -204,6 +201,7 @@ function failTest(type) {
 function startTimer() {
     if (timerInterval || !isLevelActive) return;
     const targetTime = levels[currentLevel].time;
+    // Adjusted increment logic to match target seconds exactly
     const increment = 10 / targetTime; 
     timerInterval = setInterval(() => {
         progress += increment; 
