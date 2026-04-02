@@ -1,5 +1,5 @@
 // --- VERSION CONTROL ---
-const JS_VERSION_TIME = "April 02, 2026 - 15:20"; 
+const JS_VERSION_TIME = "April 02, 2026 - 16:10"; 
 
 let r;
 const canvas = document.getElementById('mainCanvas');
@@ -13,8 +13,7 @@ const versionTag = document.getElementById('version-tag');
 // --- Gamification Settings ---
 let currentLevel = 1;
 let isLevelActive = false; 
-let errorTimeout = null;
-let levelStartTime = 0; // Track when the level actually started to allow a grace period
+let levelStartTime = 0; 
 
 const levels = {
     1: { time: 10, top: '--primary-400', mid: '--primary-300', failTitle: "Uh-oh!", failBody: "Feeling a bit tipsy, are we?" },
@@ -22,20 +21,20 @@ const levels = {
     3: { time: 20, top: '--info-dark', mid: '--info-mid', failTitle: "Uh-oh! Nearly there!", failBody: "Feeling a bit tipsy, are we? Focus! This is the final stretch." }
 };
 
-// --- Detection Settings (Recalibrated) ---
+// --- Detection Settings (Strict Recalibration) ---
 let currentState = "initial";
 let progress = 0;
 let timerInterval = null;
 let stillnessBuffer = 0;
 let successTriggered = false;
 
-const FLAT_LIMIT = 12;           // Slightly more lenient angle
-const SMOOTHING_FACTOR = 0.10;   // Heavier smoothing to ignore "snappy" movements
+const FLAT_LIMIT = 10;           
+const SMOOTHING_FACTOR = 0.12;   
 let smoothedMovement = 0;
 
-const TABLE_THRESHOLD = 0.08;    // Slightly higher to catch noisy tables
-const HAND_STILLNESS_MAX = 0.45; // Increased to allow more natural "sober" handheld movement
-const STILLNESS_REQUIRED_FRAMES = 15; // Faster surface detection
+const TABLE_THRESHOLD = 0.08;    
+const HAND_STILLNESS_MAX = 0.40; // Strict handheld threshold
+const STILLNESS_REQUIRED_FRAMES = 15; 
 
 const isTrueMobile = () => {
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -148,7 +147,7 @@ function handleSensors(event) {
         const timeSinceStart = Date.now() - levelStartTime;
 
         if (isFlat) {
-            // 1. Immediate Surface Check (Absolute priority)
+            // Priority 1: Surface Check
             if (rawMovement < TABLE_THRESHOLD) {
                 stillnessBuffer++;
                 if (stillnessBuffer > STILLNESS_REQUIRED_FRAMES) {
@@ -159,40 +158,31 @@ function handleSensors(event) {
                 stillnessBuffer = 0;
             }
 
-            // 2. Movement Logic
+            // Priority 2: Keep Steady Check
             if (smoothedMovement <= HAND_STILLNESS_MAX) {
-                clearWobbleTimer();
                 if (currentState === "balance") updateUI("keeping_still");
                 startTimer();
             } else {
-                // Ignore wobbles for the first 800ms of a level to allow for initial adjustment
-                if (timeSinceStart < 800) return;
-
-                pauseTimer(); 
-                if (!errorTimeout) {
-                    errorTimeout = setTimeout(() => {
-                        failTest("wobble_error");
-                    }, 2000); 
-                }
+                // Ignore small shakes for first 500ms for initial placement
+                if (timeSinceStart < 500) return;
+                
+                // Active level failure: If user moves too much, fail immediately
+                failTest("wobble_error");
             }
         } else {
-            // Not flat: Pause but allow user to level it back within the wobble timeout
-            stillnessBuffer = 0;
-            pauseTimer();
-            if (currentState === "keeping_still") updateUI("balance");
+            // Tilted: Immediate failure if timer was running, or return to balance UI
+            if (progress > 0) {
+                 failTest("wobble_error");
+            } else {
+                 stillnessBuffer = 0;
+                 pauseTimer();
+                 if (currentState === "keeping_still") updateUI("balance");
+            }
         }
     };
 }
 
-function clearWobbleTimer() {
-    if (errorTimeout) {
-        clearTimeout(errorTimeout);
-        errorTimeout = null;
-    }
-}
-
 function failTest(type) {
-    clearWobbleTimer();
     pauseTimer();
     progress = 0;
     progressBar.style.width = '0%';
@@ -216,7 +206,6 @@ function startTimer() {
 
 function levelComplete() {
     pauseTimer();
-    clearWobbleTimer();
     if (currentLevel < 3) updateUI("level_success");
     else {
         successTriggered = true;
@@ -237,7 +226,7 @@ mainBtn.addEventListener('click', () => {
         progress = 0;
         progressBar.style.width = '0%';
         isLevelActive = true; 
-        levelStartTime = Date.now(); // Start the grace period clock
+        levelStartTime = Date.now(); 
         
         if (typeof DeviceMotionEvent.requestPermission === 'function') {
             DeviceMotionEvent.requestPermission().then(permission => {
