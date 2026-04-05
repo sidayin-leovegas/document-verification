@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Global Jackpot 2026</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h6>Global Jackpot 2026</h6>
+    
+    <p class="ux-instructions">
+        Select a brand, jackpot level, and excitement level, then click generate to view your custom winning animation.
+    </p>
+    
+    <div class="interface-wrapper">
+        <p class="group-label">Select Theme</p>
+        <div class="theme-grid" id="theme-group">
+            <input type="radio" id="option-b" name="theme-group" value="LeoVegas">
+            <label for="option-b">LeoVegas</label>
+            <input type="radio" id="option-c" name="theme-group" value="BetMGM">
+            <label for="option-c">BetMGM</label>
+            <input type="radio" id="option-d" name="theme-group" value="Expekt">
+            <label for="option-d">Expekt</label>
+            <input type="radio" id="option-e" name="theme-group" value="GoGo">
+            <label for="option-e">GoGo</label>
+        </div>
+
+        <p class="group-label">Win Level</p>
+        <div class="status-grid" id="win-group">
+            <input type="radio" id="win-1" name="win-group" value="1">
+            <label for="win-1">1</label>
+            <input type="radio" id="win-2" name="win-group" value="2">
+            <label for="win-2">2</label>
+            <input type="radio" id="win-3" name="win-group" value="3">
+            <label for="win-3">3</label>
+            <input type="radio" id="win-4" name="win-group" value="4">
+            <label for="win-4">4</label>
+        </div>
+
+        <p class="group-label">Excitement Level</p>
+        <div class="status-grid" id="ex-group">
+            <input type="radio" id="ex-1" name="ex-group" value="1">
+            <label for="ex-1">1</label>
+            <input type="radio" id="ex-2" name="ex-group" value="2">
+            <label for="ex-2">2</label>
+            <input type="radio" id="ex-3" name="ex-group" value="3">
+            <label for="ex-3">3</label>
+            <input type="radio" id="ex-4" name="ex-group" value="4">
+            <label for="ex-4">4</label>
+        </div>
+
+        <button id="generateBtn" class="generate-button" disabled>Generate Animation</button>
+    </div>
+</div>
+
+<div id="animationModal" class="modal-overlay">
+    <button id="closeModal" class="close-x">&times;</button>
+    <div class="modal-content">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+</div>
+
+<script src="js/init.js"></script>
+</body>
+</html>
