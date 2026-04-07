@@ -171,8 +171,6 @@ input[type="radio"] { display: none; }
 #mainCanvas {    
     width: 100vw !important;
     height: 100vh !important;
-    height: 100dvh !important;
-    max-width: 1000px; 
     background: transparent;
     display: block;    
 } 
