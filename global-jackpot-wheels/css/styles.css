@@ -172,7 +172,7 @@ input[type="radio"] { display: none; }
     width: 100vw !important;
     height: 100vh !important;
     height: 100dvh !important;
-    max-width: 1000px; /* Optional cap for ultra-wide desktop screens */
+    max-width: 1000px; 
     background: transparent;
     display: block;    
 } 
