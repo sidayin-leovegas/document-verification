@@ -36,7 +36,47 @@ function initRive() {
     r = new rive.Rive({
         src: rivFile,
         canvas: canvas,
-        // ... rest of your config
+        stateMachines: 'State Machine 1',
+        autoplay: true,
+        onLoad: () => {
+            // ONLY trigger UI block if load is successful
+            r.resizeDrawingSurfaceToCanvas();
+            modal.style.transition = 'none';
+            modal.style.opacity = '1';
+            modal.classList.add('active');
+
+            try {
+                const vm = r.defaultViewModel();
+                if (vm) {
+                    const vmi = vm.instance();
+                    r.bindViewModelInstance(vmi);
+                    if (vmi.string('welcomeText')) vmi.string('welcomeText').value = welcomeTextValue;
+
+                    setTimeout(() => {
+                        const loadingComplete = vmi.boolean('LoadingComplete');
+                        if (loadingComplete) loadingComplete.value = true;
+                    }, speedMs);
+                }
+            } catch (e) {
+                console.error('[Rive] Init Error:', e.message);
+            }
+        },
+        onLoadError: () => {
+            console.error(`[Rive] 404 - Could not find: ${rivFile}`);
+            alert(`File not found: ${rivFile}\n\nCheck case-sensitivity and folder structure.`);
+        },
+        onStop: () => {
+            modal.style.pointerEvents = 'none';
+            modal.style.transition = 'opacity 0.5s ease';
+            modal.style.opacity = '0';
+            const fallback = setTimeout(closeAnimation, 600);
+            modal.addEventListener('transitionend', () => {
+                clearTimeout(fallback);
+                closeAnimation();
+            }, { once: true });
+        }
+    });
+}
 
 // Helper functions
 function getSelection(name) {
