@@ -22,7 +22,7 @@ function initRive() {
     const brand = getSelection('theme-group');
     const speedMs = parseInt(getSelection('speed-group'));
     const welcomeTextValue = welcomeInput.value;
-    const rivFile = `assets/${brand}_intro.riv`;
+    const rivFile = `./assets/${brand}_intro.riv`;
 
     if (r) { r.cleanup(); }
 
