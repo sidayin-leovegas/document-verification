@@ -39,7 +39,6 @@ function initRive() {
         stateMachines: 'State Machine 1',
         autoplay: true,
         onLoad: () => {
-            // ONLY trigger UI block if load is successful
             r.resizeDrawingSurfaceToCanvas();
             modal.style.transition = 'none';
             modal.style.opacity = '1';
@@ -76,7 +75,7 @@ function initRive() {
             }, { once: true });
         }
     });
-}
+} // <--- THIS WAS MISSING
 
 // Helper functions
 function getSelection(name) {
@@ -89,5 +88,12 @@ function validateSelection() {
     generateBtn.disabled = !allSelected;
 }
 
+// Event Listeners
 document.querySelectorAll('input[type="radio"]').forEach(radio => radio.addEventListener('change', validateSelection));
 generateBtn.addEventListener('click', initRive);
+
+// Resize Observer
+const ro = new ResizeObserver(() => {
+    if (r && canvas) r.resizeDrawingSurfaceToCanvas();
+});
+if (canvas.parentElement) ro.observe(canvas.parentElement);
