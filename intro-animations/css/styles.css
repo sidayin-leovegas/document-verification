@@ -246,3 +246,26 @@ body:has(#option-h:checked) { --primary-500: #e61629; --primary-400: #ea3949; --
     --bg-bottom: var(--primary-300);
 
 }
+
+/*Slot Boss*/
+body:has(#option-j:checked) { --primary-500: #9bc449; --primary-400: #aacd64; --primary-300: #b9d680; --font: "Montserrat"; --default-bg: #eef3f3;
+    --error-dark:#B60919;
+    --error-mid:#FF4A5B;
+    --error-light:#FFEFF1;
+
+    --warning-dark:#AA5F17;
+    --warning-mid:#FF8A1A;
+    --warning-light:#FCF3EA;
+
+    --success-dark:#547B06;
+    --success-mid:#90BC38;
+    --success-light:#F5FDE6;
+    
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E9EEFF;
+    
+    --bg-top: var(--primary-400);
+    --bg-bottom: var(--primary-300);
+
+ }
