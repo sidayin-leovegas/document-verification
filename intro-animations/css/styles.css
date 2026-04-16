@@ -202,3 +202,24 @@ body:has(#option-c:checked) { --primary-500: #b19661; --font: "Sofia Sans"; --de
 body:has(#option-d:checked) { --primary-500: #fe8000; --font: "Inter"; --default-bg: #f5f7fb; --button-text-primary: #000; }
 body:has(#option-e:checked) { --primary-500: #f14aa7; --font: "Poppins"; --default-bg: #000; --paper: #222; --body-text: #fff; --button-text-primary: #fff; }
 body:has(#option-f:checked) { --primary-500: #53A653; --font: "Kanit"; --default-bg: #F9F9F9; --paper: #fff; --body-text: #000; --button-text-primary: #000; }
+body:has(#option-g:checked) { --primary-500: #ff1a7a; --primary-400: #ff3c8e; --primary-300: #ff5fa2; --font: "Dosis"; --default-bg: #2e1a37; --paper: #452b51; --body-text: #fff; 
+--error-dark:#AE000C;
+    --error-mid:#E62C39;
+    --error-light:#FFE3E5;
+
+    --warning-dark:#AA5F17;
+    --warning-mid:#FF7A00;
+    --warning-light:#FFEDDC;
+
+    --success-dark:#087E29;
+    --success-mid:#42C867;
+    --success-light:#E9FFEF;
+    
+    --info-dark:#1618D3;
+    --info-mid:#5478FB;
+    --info-light:#E9EEFF;
+        
+    --bg-top: var(--primary-400);
+    --bg-bottom: var(--primary-300);
+
+}
