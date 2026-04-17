@@ -59,21 +59,31 @@ h6 {
 }
 
 /* --- Grids & Radio Buttons --- */
+
+/* Default: 3 columns for brand/theme buttons */
 .theme-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spaceunit);
     width: 100%;
     padding: var(--spaceunit) 0;
 }
 
-/* Force Level buttons (1-4) onto a single row with equal widths */
+/* Always 4 columns for Win and Excitement levels */
 .status-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spaceunit);
     width: 100%;
     padding: var(--spaceunit) 0;
+}
+
+/* Responsive adjustment for small mobile screens */
+@media (max-width: 420px) {
+    .theme-grid {
+        /* Drops to 2 columns when the screen is narrow */
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .theme-grid label, .status-grid label {
@@ -89,6 +99,7 @@ h6 {
     font-size: 13px;
     border: 2px solid transparent;
     white-space: nowrap;
+    padding: 0 var(--spaceunit);
 }
 
 input[type="radio"]:checked + label {
